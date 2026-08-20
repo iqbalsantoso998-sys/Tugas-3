@@ -1,0 +1,991 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portofolio Digital - Nama Siswa</title>
+    <style>
+        /* === VARIABLES & GLOBAL STYLES (iOS + True Black & Neon Blue 3D Theme) === */
+        :root {
+            --bg-color: #F2F2F7;
+            --surface-color: #FFFFFF;
+            --primary-color: #007AFF;
+            --text-dark: #000000;
+            --text-light: #8E8E93;
+            --border-color: rgba(60, 60, 67, 0.15);
+            --header-bg: rgba(255, 255, 255, 0.75);
+            --shadow: 0 10px 30px rgba(0,0,0,0.06);
+            --border-radius: 20px;
+            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            --glow-effect: none;
+            --bg-grid-color: rgba(0, 122, 255, 0.05);
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #030305;
+            --surface-color: #0d0e12;
+            --primary-color: #00bfff;
+            --text-dark: #F8F9FA;
+            --text-light: #9DA3AF;
+            --border-color: rgba(0, 191, 255, 0.25);
+            --header-bg: rgba(13, 14, 18, 0.85);
+            --shadow: 0 15px 35px rgba(0, 191, 255, 0.18), 0 2px 5px rgba(0,0,0,0.9);
+            --glow-effect: 0 0 25px rgba(0, 191, 255, 0.55);
+            --bg-grid-color: rgba(0, 191, 255, 0.08);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, Helvetica, sans-serif;
+            transform-style: preserve-3d;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-dark);
+            line-height: 1.6;
+            transition: background-color 0.4s ease, color 0.4s ease;
+            perspective: 1400px;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* === 3D DYNAMIC BACKGROUND & CANVAS === */
+        #bgCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .glow-orb {
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(0, 191, 255, 0.2) 0%, transparent 70%);
+            border-radius: 50%;
+            filter: blur(80px);
+            animation: floatOrb 14s ease-in-out infinite alternate;
+            pointer-events: none;
+            z-index: -2;
+        }
+
+        .orb-1 { top: -150px; left: -150px; }
+        .orb-2 { bottom: -150px; right: -150px; animation-delay: -7s; background: radial-gradient(circle, rgba(0, 122, 255, 0.18) 0%, transparent 70%); }
+
+        @keyframes floatOrb {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(70px, 80px) scale(1.2); }
+        }
+
+        /* === TYPOGRAPHY === */
+        h1, h2, h3 {
+            color: var(--text-dark);
+            margin-bottom: 1rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        p {
+            margin-bottom: 1rem;
+            color: var(--text-light);
+        }
+
+        a {
+            text-decoration: none;
+            color: var(--primary-color);
+            transition: var(--transition);
+        }
+
+        a:hover {
+            text-shadow: var(--glow-effect);
+        }
+
+        /* === LAYOUT & CONTAINERS === */
+        .container {
+            max-width: 1050px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        section {
+            padding: 5rem 0;
+            display: none; 
+            animation: fadeIn 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px) translateZ(-30px); }
+            to { opacity: 1; transform: translateY(0) translateZ(0); }
+        }
+
+        section.active {
+            display: block; 
+        }
+
+        /* === NAVIGATION (HEADER & NAVBAR) === */
+        header {
+            background-color: var(--header-bg);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            transition: background-color 0.4s ease, border-color 0.4s ease;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.1rem 2rem;
+            max-width: 1050px;
+            margin: 0 auto;
+        }
+
+        .brand {
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: var(--text-dark);
+            letter-spacing: -0.5px;
+        }
+        
+        [data-theme="dark"] .brand {
+            text-shadow: 0 0 12px rgba(0, 191, 255, 0.7);
+        }
+        
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 1.2rem;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 0.5rem;
+        }
+
+        .nav-links li a {
+            color: var(--text-light);
+            font-weight: 500;
+            font-size: 0.95rem;
+            padding: 0.55rem 0.9rem;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .nav-links li a:hover {
+            background-color: var(--border-color);
+            color: var(--text-dark);
+            transform: translateY(-2px);
+        }
+
+        .nav-links li a.active {
+            color: var(--primary-color);
+            background-color: rgba(0, 191, 255, 0.15);
+            box-shadow: var(--glow-effect);
+            font-weight: 600;
+        }
+
+        /* Toggle Switch iOS Style */
+        .theme-toggle {
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            color: var(--text-dark);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            font-size: 1.1rem;
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.1) rotate(15deg);
+            box-shadow: var(--glow-effect);
+            border-color: var(--primary-color);
+        }
+
+        /* === BUTTONS === */
+        .btn {
+            display: inline-block;
+            padding: 0.85rem 1.8rem;
+            background-color: var(--primary-color);
+            color: #fff;
+            border: none;
+            border-radius: 14px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: var(--transition);
+            font-size: 0.95rem;
+            transform: translateZ(25px);
+        }
+
+        [data-theme="dark"] .btn {
+            box-shadow: 0 0 25px rgba(0, 191, 255, 0.5);
+            color: #030305;
+        }
+
+        .btn:hover {
+            opacity: 0.95;
+            transform: translateZ(35px) scale(1.03);
+            box-shadow: var(--glow-effect);
+        }
+        
+        .btn-secondary {
+            background-color: var(--surface-color);
+            color: var(--primary-color);
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow);
+        }
+
+        [data-theme="dark"] .btn-secondary {
+            color: var(--primary-color);
+        }
+
+        /* === HOME SECTION (Hero) === */
+        #beranda {
+            text-align: center;
+            padding-top: 5rem;
+        }
+
+        .hero-profile-container {
+            position: relative;
+            display: inline-block;
+            margin-bottom: 2rem;
+            transform: translateZ(50px);
+        }
+
+        .hero-profile {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid var(--primary-color);
+            box-shadow: var(--shadow);
+            background-color: var(--surface-color); 
+            transition: var(--transition);
+        }
+
+        [data-theme="dark"] .hero-profile {
+            box-shadow: 0 0 35px rgba(0, 191, 255, 0.7);
+        }
+
+        .hero-profile-container::after {
+            content: '';
+            position: absolute;
+            inset: -10px;
+            border-radius: 50%;
+            border: 2px dashed var(--primary-color);
+            opacity: 0.6;
+            animation: rotateRing 20s linear infinite;
+        }
+
+        @keyframes rotateRing {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .skills {
+            display: flex;
+            justify-content: center;
+            gap: 0.85rem;
+            margin-top: 3rem;
+            flex-wrap: wrap;
+        }
+
+        .skill-tag {
+            background-color: var(--surface-color);
+            padding: 0.6rem 1.2rem;
+            border-radius: 25px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            box-shadow: var(--shadow);
+            color: var(--text-dark);
+            border: 1px solid var(--border-color);
+            transition: var(--transition);
+            transform: translateZ(30px); 
+        }
+
+        .skill-tag:hover {
+            border-color: var(--primary-color);
+            box-shadow: var(--glow-effect);
+            transform: translateZ(45px) scale(1.08);
+        }
+
+        /* === CARDS (3D Layered Cards dengan efek Tilt Dinamis) === */
+        .card, .bio-card, .gallery-card, form, .contact-info {
+            background-color: var(--surface-color);
+            border-radius: var(--border-radius);
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow);
+            transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.3s ease, border-color 0.3s ease;
+            overflow: hidden;
+            transform: translateZ(25px);
+            will-change: transform;
+            position: relative;
+        }
+        
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, transparent, var(--primary-color), transparent);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .card:hover::before, .bio-card:hover::before {
+            opacity: 1;
+        }
+
+        .card:hover, .bio-card:hover, .gallery-card:hover, form:hover, .contact-info:hover {
+            border-color: var(--primary-color);
+            box-shadow: 0 25px 50px rgba(0, 191, 255, 0.35), 0 10px 25px rgba(0,0,0,0.8);
+        }
+
+        /* === ABOUT SECTION === */
+        .about-content {
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr;
+            gap: 2.5rem;
+        }
+        
+        @media (max-width: 768px) {
+            .about-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .bio-card, .gallery-card {
+            padding: 2.5rem;
+        }
+
+        .bio-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .bio-table td {
+            padding: 1rem 0;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-dark);
+            font-size: 0.98rem;
+        }
+
+        .bio-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .bio-table td:first-child {
+            font-weight: 600;
+            width: 42%;
+            color: var(--text-light);
+        }
+
+        .photo-gallery {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.2rem;
+            margin-top: 1.5rem;
+        }
+
+        .photo-gallery div {
+            width: 100%;
+            height: 130px;
+            border-radius: 14px;
+            background: linear-gradient(135deg, var(--bg-color), var(--border-color));
+            border: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            color: var(--text-light);
+            font-weight: 600;
+            transition: var(--transition);
+        }
+
+        .photo-gallery div:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+            box-shadow: var(--glow-effect);
+            transform: scale(1.03);
+        }
+
+        /* === PORTFOLIO / MODULE SECTIONS === */
+        .module-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2rem;
+        }
+
+        .card-img-placeholder {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(135deg, rgba(0, 191, 255, 0.08), var(--border-color));
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-light);
+            font-style: italic;
+            font-weight: 500;
+            font-size: 0.95rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card-img-placeholder::after {
+            content: '✨ 3D Interactive Module';
+            position: absolute;
+            bottom: 12px;
+            right: 12px;
+            font-size: 0.75rem;
+            background: var(--surface-color);
+            padding: 4px 10px;
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+            color: var(--primary-color);
+            font-style: normal;
+        }
+
+        .card-content {
+            padding: 2rem;
+        }
+        
+        .card-content h3 {
+            font-size: 1.25rem;
+            margin-bottom: 0.75rem;
+        }
+
+        /* === CONTACT SECTION === */
+        .contact-container {
+            display: grid;
+            grid-template-columns: 1.3fr 0.7fr;
+            gap: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            .contact-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        form {
+            padding: 2.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            display: block;
+            margin-bottom: 0.6rem;
+            color: var(--text-dark);
+            font-size: 0.92rem;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.9rem 1.2rem;
+            background-color: var(--bg-color);
+            border: 1px solid var(--border-color);
+            color: var(--text-dark);
+            border-radius: 12px;
+            font-family: inherit;
+            transition: var(--transition);
+            font-size: 0.98rem;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            background-color: var(--surface-color);
+            box-shadow: var(--glow-effect);
+        }
+
+        .contact-info {
+            padding: 2.5rem;
+        }
+
+        /* === FOOTER === */
+        footer {
+            text-align: center;
+            padding: 3rem 2rem;
+            margin-top: 5rem;
+            color: var(--text-light);
+            font-size: 0.92rem;
+            border-top: 1px solid var(--border-color);
+            position: relative;
+            z-index: 1;
+        }
+
+        .social-links {
+            margin-top: 1.2rem;
+        }
+
+        .social-links a {
+            color: var(--text-light);
+            margin: 0 0.8rem;
+            font-weight: 500;
+        }
+        
+        .social-links a:hover {
+            color: var(--primary-color);
+            text-shadow: var(--glow-effect);
+        }
+        
+        /* Mobile menu toggle */
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.6rem;
+            color: var(--text-dark);
+            cursor: pointer;
+        }
+        
+        @media (max-width: 768px) {
+            .menu-toggle { display: block; }
+            .nav-links {
+                display: none;
+                flex-direction: column;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background-color: var(--header-bg);
+                backdrop-filter: blur(25px);
+                -webkit-backdrop-filter: blur(25px);
+                border-bottom: 1px solid var(--border-color);
+                box-shadow: var(--shadow);
+                padding: 1.5rem;
+                gap: 0.8rem;
+            }
+            .nav-links.show { display: flex; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 3D Interactive Background Canvas & Glowing Orbs -->
+    <canvas id="bgCanvas"></canvas>
+    <div class="glow-orb orb-1"></div>
+    <div class="glow-orb orb-2"></div>
+
+    <header>
+        <nav>
+            <div class="brand">NamaSiswa.Dev</div>
+            <div class="nav-right">
+                <button class="theme-toggle" id="themeToggle" title="Ubah Tema iOS" onclick="toggleTheme()">
+                    <span id="themeIcon">🌓</span>
+                </button>
+                <button class="menu-toggle" onclick="toggleMenu()">☰</button>
+            </div>
+            <ul class="nav-links" id="nav-links">
+                <li><a onclick="showSection('beranda')" class="nav-btn active" id="nav-beranda">Beranda</a></li>
+                <li><a onclick="showSection('tentang')" class="nav-btn" id="nav-tentang">Tentang Saya</a></li>
+                <li><a onclick="showSection('jaringan')" class="nav-btn" id="nav-jaringan">Jaringan</a></li>
+                <li><a onclick="showSection('iot')" class="nav-btn" id="nav-iot">IoT & Arduino</a></li>
+                <li><a onclick="showSection('karya')" class="nav-btn" id="nav-karya">Galeri Karya</a></li>
+                <li><a onclick="showSection('kontak')" class="nav-btn" id="nav-kontak">Kontak</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="container">
+        <section id="beranda" class="active">
+            <div class="hero-profile-container">
+                <img src="assets/img/profil.jpg" alt="Foto Profil" class="hero-profile" onerror="this.src='data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22150%22%20height%3D%22150%22%20viewBox%3D%220%200%20150%20150%22%3E%3Crect%20fill%3D%22%230c0e12%22%20width%3D%22150%22%20height%3D%22150%22%2F%3E%3Ctext%20fill%3D%22%2300bfff%22%20font-family%3D%22sans-serif%22%20font-size%3D%2215%22%20dy%3D%2210.5%22%20font-weight%3D%22bold%22%20x%3D%2250%25%22%20y%3D%2250%25%22%20text-anchor%3D%22middle%22%3EFoto%20Profil%3C%2Ftext%3E%3C%2Fsvg%3E'">
+            </div>
+            
+            <h1>Halo, Saya [Nama Lengkap]</h1>
+            <p style="font-size: 1.2rem; color: var(--text-light); max-width: 650px; margin: 0 auto;">Siswa Kelas XII - Peminatan Rekayasa Perangkat Lunak / Informatika Berstandar Industri</p>
+            
+            <div style="margin-top: 2.5rem;">
+                <button class="btn" onclick="showSection('karya')">Lihat Proyek Saya</button>
+                <button class="btn btn-secondary" style="margin-left: 1rem;" onclick="showSection('kontak')">Hubungi Saya</button>
+            </div>
+
+            <div class="skills">
+                <span class="skill-tag">⚡ HTML5 & CSS3</span>
+                <span class="skill-tag">🌐 Jaringan Dasar</span>
+                <span class="skill-tag">🛠️ Problem Solving</span>
+                <span class="skill-tag">💻 Pemrograman Dasar</span>
+                <span class="skill-tag">🔌 IoT & Arduino</span>
+            </div>
+        </section>
+
+        <section id="tentang">
+            <h2>Tentang Saya</h2>
+            <div class="about-content">
+                <article class="bio-card">
+                    <h3>Biodata Diri</h3>
+                    <table class="bio-table">
+                        <tr>
+                            <td>Nama Lengkap</td>
+                            <td>[Nama Lengkap Siswa]</td>
+                        </tr>
+                        <tr>
+                            <td>Kelas</td>
+                            <td>XII Informatika / RPL</td>
+                        </tr>
+                        <tr>
+                            <td>Asal Sekolah</td>
+                            <td>[Nama Sekolah]</td>
+                        </tr>
+                        <tr>
+                            <td>Minat Studi</td>
+                            <td>Teknik Informatika / Ilmu Komputer</td>
+                        </tr>
+                    </table>
+                    <p style="margin-top: 1.5rem;">Saya adalah siswa tingkat akhir yang sangat antusias mendalami teknologi modern, pengembangan web, serta arsitektur jaringan komputer. Berkomitmen menciptakan solusi digital bernilai tinggi.</p>
+                </article>
+
+                <article class="gallery-card">
+                    <h3>Aktivitas Belajar</h3>
+                    <p>Dokumentasi kegiatan praktikum di lab komputer sekolah.</p>
+                    <div class="photo-gallery">
+                        <div>Lab Praktikum 1</div>
+                        <div>Lab Praktikum 2</div>
+                        <div>Lab Simulasi 3</div>
+                        <div>Lab Jaringan 4</div>
+                    </div>
+                </article>
+            </div>
+        </section>
+
+        <section id="jaringan">
+            <h2>Modul Jaringan Komputer</h2>
+            <p>Kumpulan tugas dan dokumentasi pembelajaran Administrasi Infrastruktur Jaringan.</p>
+            
+            <div class="module-grid">
+                <article class="card">
+                    <div class="card-img-placeholder">Cisco Packet Tracer Topology</div>
+                    <div class="card-content">
+                        <h3>Simulasi Topologi Bintang</h3>
+                        <p>Dokumentasi perancangan dan konfigurasi IP Address pada topologi star menggunakan Cisco Packet Tracer.</p>
+                        <a href="#">Baca Selengkapnya &rarr;</a>
+                    </div>
+                </article>
+                <article class="card">
+                    <div class="card-img-placeholder">UTP Cable Crimping</div>
+                    <div class="card-content">
+                        <h3>Crimping Kabel UTP</h3>
+                        <p>Laporan praktikum pembuatan kabel jaringan Straight dan Cross-over siap uji koneksi.</p>
+                        <a href="#">Baca Selengkapnya &rarr;</a>
+                    </div>
+                </article>
+            </div>
+        </section>
+
+        <section id="iot">
+            <h2>Modul IoT & Arduino</h2>
+            <p>Eksplorasi mikrokontroler, sensor, dan aktuator cerdas.</p>
+
+            <div class="module-grid">
+                <article class="card">
+                    <div class="card-img-placeholder">Wokwi / Fritzing Schematic</div>
+                    <div class="card-content">
+                        <h3>Skematik Sensor Suhu DHT11</h3>
+                        <p>Rancangan sirkuit menghubungkan sensor DHT11 ke Arduino Uno dengan output LCD I2C.</p>
+                        <a href="#">Lihat Rangkaian &rarr;</a>
+                    </div>
+                </article>
+                <article class="card">
+                    <div class="card-img-placeholder">C/C++ Embedded Code</div>
+                    <div class="card-content">
+                        <h3>Program Kontrol Servo</h3>
+                        <p>Dokumentasi baris kode C++ untuk menggerakkan motor servo berdasarkan input sensor cahaya (LDR).</p>
+                        <a href="#">Lihat Kode &rarr;</a>
+                    </div>
+                </article>
+            </div>
+        </section>
+
+        <section id="karya">
+            <h2>Galeri Karya & Proyek</h2>
+            <p>Portofolio proyek pemrograman yang telah diselesaikan dengan standar industri.</p>
+
+            <div class="module-grid">
+                <article class="card">
+                    <div class="card-img-placeholder">School Profile Website</div>
+                    <div class="card-content">
+                        <h3>Website Profil Sekolah</h3>
+                        <p>Proyek akhir semester kelas XI: Membangun website statis responsif menggunakan HTML dan CSS modern.</p>
+                        <div style="margin-top: 1.2rem;">
+                            <a href="#" class="btn" style="padding: 0.5rem 1.2rem; font-size: 0.85rem;">Demo Live</a>
+                            <a href="#" style="margin-left: 1rem;">GitHub Repo</a>
+                        </div>
+                    </div>
+                </article>
+                <article class="card">
+                    <div class="card-img-placeholder">CLI Cashier System</div>
+                    <div class="card-content">
+                        <h3>Aplikasi Kasir Sederhana</h3>
+                        <p>Tugas pemrograman dasar membuat program kasir berbasis struktur data efisien.</p>
+                        <div style="margin-top: 1.2rem;">
+                            <a href="#">GitHub Repo &rarr;</a>
+                        </div>
+                    </div>
+                </article>
+            </div>
+        </section>
+
+        <section id="kontak">
+            <h2>Hubungi Saya</h2>
+            <div class="contact-container">
+                <form onsubmit="event.preventDefault(); showMessageBox('Formulir berhasil dikirim! (Simulasi)');">
+                    <div class="form-group">
+                        <label for="nama">Nama Pengirim</label>
+                        <input type="text" id="nama" name="nama" required placeholder="Masukkan nama Anda">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="email">Alamat Email</label>
+                        <input type="email" id="email" name="email" required placeholder="email@contoh.com">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="kategori">Kategori Pesan</label>
+                        <select id="kategori" name="kategori">
+                            <option value="pertanyaan">Pertanyaan Umum</option>
+                            <option value="kolaborasi">Kolaborasi Proyek</option>
+                            <option value="saran">Saran & Masukan</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="pesan">Pesan Teks</label>
+                        <textarea id="pesan" name="pesan" rows="5" required placeholder="Tulis pesan Anda di sini..."></textarea>
+                    </div>
+
+                    <button type="submit" class="btn">Kirim Pesan</button>
+                </form>
+
+                <div class="contact-info">
+                    <h3>Informasi Kontak</h3>
+                    <p style="margin-top: 1rem; color: var(--text-light);">Jika Anda memiliki pertanyaan atau penawaran kolaborasi, silakan hubungi kontak di bawah ini.</p>
+                    
+                    <ul style="list-style: none; margin-top: 1.5rem; display: flex; flex-direction: column; gap: 1.2rem;">
+                        <li>📧 <strong>Email Sekolah:</strong><br>siswa@smkbisa.sch.id</li>
+                        <li>📍 <strong>Lokasi:</strong><br>Kota Anda, Provinsi Jawa Timur</li>
+                        <li>🎓 <strong>Institusi:</strong><br>SMK Negeri / Swasta</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 Portofolio Digital - [Nama Siswa]. Tugas Informatika Kelas XII.</p>
+        <div class="social-links">
+            <a href="#">GitHub</a> | 
+            <a href="#">LinkedIn</a> | 
+            <a href="#">Instagram</a>
+        </div>
+    </footer>
+
+    <script>
+        // Custom non-blocking message box implementation
+        function showMessageBox(message) {
+            const box = document.createElement('div');
+            box.style.cssText = 'position:fixed; bottom:20px; right:20px; background:var(--surface-color); color:var(--text-dark); border:1px solid var(--primary-color); padding:1rem 1.5rem; border-radius:12px; box-shadow:var(--glow-effect); z-index:9999; font-weight:600;';
+            box.textContent = message;
+            document.body.appendChild(box);
+            setTimeout(() => box.remove(), 3500);
+        }
+
+        // 3D Tilt Effect on Cards
+        document.querySelectorAll('.card, .bio-card, .gallery-card, form, .contact-info').forEach(card => {
+            card.addEventListener('mousemove', (e) => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left - rect.width / 2;
+                const y = e.clientY - rect.top - rect.height / 2;
+                
+                const rotateX = (-y / rect.height) * 10;
+                const rotateY = (x / rect.width) * 10;
+                
+                card.style.transform = `translateZ(35px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+            });
+            
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = 'translateZ(0px) rotateX(0deg) rotateY(0deg)';
+            });
+        });
+
+        // Interactive 3D Background Particles / Constellation Network
+        const canvas = document.getElementById('bgCanvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        let mouse = { x: null, y: null, radius: 150 };
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        window.addEventListener('mousemove', (e) => {
+            mouse.x = e.clientX;
+            mouse.y = e.clientY;
+        });
+
+        window.addEventListener('mouseout', () => {
+            mouse.x = null;
+            mouse.y = null;
+        });
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.vx = (Math.random() - 0.5) * 0.8;
+                this.vy = (Math.random() - 0.5) * 0.8;
+                this.radius = Math.random() * 2 + 1;
+            }
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+
+                if (this.x < 0 || this.x > canvas.width) this.vx = -this.vx;
+                if (this.y < 0 || this.y > canvas.height) this.vy = -this.vy;
+            }
+            draw() {
+                const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+                ctx.fillStyle = isDark ? 'rgba(0, 191, 255, 0.45)' : 'rgba(0, 122, 255, 0.25)';
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        function initParticles() {
+            particles = [];
+            const count = Math.floor((canvas.width * canvas.height) / 14000);
+            for (let i = 0; i < count; i++) {
+                particles.push(new Particle());
+            }
+        }
+        initParticles();
+
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+
+            for (let i = 0; i < particles.length; i++) {
+                particles[i].update();
+                particles[i].draw();
+
+                for (let j = i + 1; j < particles.length; j++) {
+                    const dx = particles[i].x - particles[j].x;
+                    const dy = particles[i].y - particles[j].y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+
+                    if (dist < 110) {
+                        ctx.strokeStyle = isDark ? `rgba(0, 191, 255, ${0.15 * (1 - dist / 110)})` : `rgba(0, 122, 255, ${0.1 * (1 - dist / 110)})`;
+                        ctx.lineWidth = 0.8;
+                        ctx.beginPath();
+                        ctx.moveTo(particles[i].x, particles[i].y);
+                        ctx.lineTo(particles[j].x, particles[j].y);
+                        ctx.stroke();
+                    }
+                }
+
+                if (mouse.x !== null && mouse.y !== null) {
+                    const mdx = particles[i].x - mouse.x;
+                    const mdy = particles[i].y - mouse.y;
+                    const mdist = Math.sqrt(mdx * mdx + mdy * mdy);
+
+                    if (mdist < mouse.radius) {
+                        ctx.strokeStyle = isDark ? `rgba(0, 191, 255, ${0.35 * (1 - mdist / mouse.radius)})` : `rgba(0, 122, 255, ${0.25 * (1 - mdist / mouse.radius)})`;
+                        ctx.lineWidth = 1;
+                        ctx.beginPath();
+                        ctx.moveTo(particles[i].x, particles[i].y);
+                        ctx.lineTo(mouse.x, mouse.y);
+                        ctx.stroke();
+                    }
+                }
+            }
+            requestAnimationFrame(animateParticles);
+        }
+        animateParticles();
+
+        function showSection(sectionId) {
+            document.querySelectorAll('section').forEach(sec => {
+                sec.classList.remove('active');
+            });
+            
+            document.getElementById(sectionId).classList.add('active');
+
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.getElementById('nav-' + sectionId).classList.add('active');
+            
+            const navLinks = document.getElementById('nav-links');
+            if(navLinks.classList.contains('show')) {
+                navLinks.classList.remove('show');
+            }
+            
+            window.scrollTo(0, 0);
+        }
+
+        function toggleMenu() {
+            document.getElementById('nav-links').classList.toggle('show');
+        }
+
+        const themeIcon = document.getElementById('themeIcon');
+        
+        function initTheme() {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'light') {
+                document.documentElement.removeAttribute('data-theme');
+                themeIcon.textContent = '🌙';
+            } else {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                localStorage.setItem('theme', 'dark');
+                themeIcon.textContent = '☀️';
+            }
+        }
+
+        function toggleTheme() {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            if (currentTheme === 'dark') {
+                document.documentElement.removeAttribute('data-theme');
+                localStorage.setItem('theme', 'light');
+                themeIcon.textContent = '🌙';
+            } else {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                localStorage.setItem('theme', 'dark');
+                themeIcon.textContent = '☀️';
+            }
+        }
+
+        initTheme();
+    </script>
+</body>
+</html>
